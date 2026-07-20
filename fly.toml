@@ -1,0 +1,52 @@
+# Fly.io app config for the chat worker.
+#
+# Scale-to-zero design:
+#   - Worker self-exits after WORKER_IDLE_EXIT_MS of empty BRPOPs.
+#   - [restart] policy = "no" keeps the machine stopped after a clean exit.
+#   - POST /api/chat (on Vercel) calls the Fly Machines API to start the
+#     machine on demand — see app/lib/fly-wake.ts.
+#
+# Rename `app = ...` after running `fly launch --no-deploy`, then set
+# FLY_APP_NAME and FLY_MACHINE_ID on Vercel so the wake call works.
+
+app = "artifacts-worker"
+primary_region = "iad"
+
+[build]
+  dockerfile = "worker/Dockerfile"
+
+[env]
+  # Effectively infinity — disables the legacy handoff path in work.ts
+  # because the Fly process has no maxDuration cap. Kept here in addition
+  # to the Dockerfile ENV so it shows up in `fly config show`.
+  CHAT_HANDOFF_THRESHOLD_MS = "9999999999"
+  # Up to 5 streams per worker. Streams are I/O-bound so memory is the
+  # main constraint; bump to 1024 MB on the VM if peak >400 MB.
+  WORKER_CONCURRENCY = "5"
+  # Exit after this many ms of nothing in the queue. Lower = stops faster
+  # (cheaper) but a burst of requests pays the cold-start tax more often.
+  WORKER_IDLE_EXIT_MS = "30000"
+  # Max concurrent code-execution sandbox runs (run_code / artifact.exec). Each
+  # python/node/ffmpeg job is CPU + memory heavy, so keep this low to avoid
+  # OOM next to a Chromium render. See app/lib/exec/sandbox.ts.
+  EXEC_MAX_CONCURRENCY = "2"
+
+# Pure worker — no inbound ports. Don't add [http_service] unless you
+# also want to expose a health endpoint; the proxy-driven auto_stop_machines
+# / auto_start_machines flags only apply to HTTP traffic and would conflict
+# with the self-exit pattern below.
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 2
+  # 2048 MB so a code-execution sandbox run (python/ffmpeg can spike to
+  # hundreds of MB on real media) has headroom alongside the chat worker's
+  # baseline and a possible concurrent Chromium render (~300-400 MB peak).
+  # Drop back to 1024 only if you disable Code Execution and set
+  # WORKER_MAX_RENDERS accordingly.
+  memory_mb = 2048
+
+[[restart]]
+  # When the process exits 0, leave the machine in the stopped state.
+  # /api/chat starts it again on the next enqueue via the Machines API.
+  policy = "never"

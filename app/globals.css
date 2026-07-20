@@ -1,0 +1,597 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Soft Paper tokens (used by our own components) */
+  --color-bg: #f4efe6;
+  --color-surface: #fffdf7;
+  --color-surface-2: #ebe4d6;
+  --color-ink: #1a1814;
+  --color-ink-soft: #5a5347;
+  --color-ink-dim: #8a8273;
+  --color-accent: #c8412d;
+  --color-accent-2: #2d4a3e;
+  --color-rule: #d8cfbe;
+
+  --shadow-1: 0 1px 2px rgba(40, 30, 15, 0.05), 0 4px 12px rgba(40, 30, 15, 0.06);
+  --shadow-2: 0 2px 4px rgba(40, 30, 15, 0.08), 0 16px 40px -8px rgba(40, 30, 15, 0.18);
+
+  /* Iowan Old Style first so Apple devices keep their native rendering;
+     the bundled Source Serif 4 (--font-serif-web, set by next/font on
+     <html>) catches every platform that lacks it — previously those fell
+     all the way to Times New Roman. */
+  --font-display: "Iowan Old Style", var(--font-serif-web, Georgia), Georgia, serif;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, Menlo, "SFMono-Regular", monospace;
+  /* Long-form reading surfaces (messages, notes, the reader column) resolve
+     their family from --font-reading rather than --font-display, so the
+     "Reading" aspect in Preferences can be tuned independently of headings.
+     Defaults to the heading serif so behavior is unchanged until a user picks
+     something else; the font boot script overrides all four vars on <html>. */
+  --font-reading: var(--font-display);
+}
+
+/* Tell shadcn primitives to use our token values */
+@theme inline {
+  --font-heading: var(--font-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* :root carries Soft Paper (light) values. The `.dark` block below mirrors
+   the same tokens with a warm-dark palette so adding `.dark` to <html>
+   flips the whole UI. */
+:root {
+  --radius: 0.75rem;
+
+  --background: #f4efe6;
+  --foreground: #1a1814;
+
+  --card: #fffdf7;
+  --card-foreground: #1a1814;
+
+  --popover: #fffdf7;
+  --popover-foreground: #1a1814;
+
+  --primary: #c8412d;
+  --primary-foreground: #fffdf7;
+
+  --secondary: #ebe4d6;
+  --secondary-foreground: #5a5347;
+
+  --muted: #ebe4d6;
+  --muted-foreground: #8a8273;
+
+  --accent: #ebe4d6;
+  --accent-foreground: #1a1814;
+
+  --destructive: #c8412d;
+
+  --border: #d8cfbe;
+  --input: #d8cfbe;
+  --ring: rgba(200, 65, 45, 0.5);
+
+  --chart-1: #c8412d;
+  --chart-2: #2d4a3e;
+  --chart-3: #b07b3e;
+  --chart-4: #5a5347;
+  --chart-5: #8a4a14;
+
+  --sidebar: #fffdf7;
+  --sidebar-foreground: #1a1814;
+  --sidebar-primary: #c8412d;
+  --sidebar-primary-foreground: #fffdf7;
+  --sidebar-accent: #ebe4d6;
+  --sidebar-accent-foreground: #1a1814;
+  --sidebar-border: #d8cfbe;
+  --sidebar-ring: rgba(200, 65, 45, 0.5);
+}
+
+/* Dark theme — re-skins the same tokens. Activated by adding the `dark`
+   class to <html> (see ThemeToggle / inline boot script in layout.tsx). */
+.dark {
+  --color-bg: #161412;
+  --color-surface: #211e1a;
+  --color-surface-2: #2c2823;
+  --color-ink: #f1ece2;
+  --color-ink-soft: #c4baa6;
+  --color-ink-dim: #8a8273;
+  --color-accent: #e07358;
+  --color-accent-2: #6fae93;
+  --color-rule: #3a342c;
+
+  --background: #161412;
+  --foreground: #f1ece2;
+
+  --card: #211e1a;
+  --card-foreground: #f1ece2;
+
+  --popover: #211e1a;
+  --popover-foreground: #f1ece2;
+
+  --primary: #e07358;
+  --primary-foreground: #161412;
+
+  --secondary: #2c2823;
+  --secondary-foreground: #c4baa6;
+
+  --muted: #2c2823;
+  --muted-foreground: #a89e89;
+
+  --accent: #2c2823;
+  --accent-foreground: #f1ece2;
+
+  --destructive: #e07358;
+
+  --border: #3a342c;
+  --input: #3a342c;
+  --ring: rgba(224, 115, 88, 0.5);
+
+  --chart-1: #e07358;
+  --chart-2: #6fae93;
+  --chart-3: #d6a76a;
+  --chart-4: #a89e89;
+  --chart-5: #c08a52;
+
+  --sidebar: #211e1a;
+  --sidebar-foreground: #f1ece2;
+  --sidebar-primary: #e07358;
+  --sidebar-primary-foreground: #161412;
+  --sidebar-accent: #2c2823;
+  --sidebar-accent-foreground: #f1ece2;
+  --sidebar-border: #3a342c;
+  --sidebar-ring: rgba(224, 115, 88, 0.5);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  html,
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+  ::selection {
+    background: rgba(200, 65, 45, 0.20);
+    color: var(--color-ink);
+  }
+  /* Native-feeling tap behavior across all interactive elements */
+  button,
+  a,
+  [role="button"],
+  label,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* Prevent iOS zoom-on-focus for any form control on touch devices.
+     Desktop keeps existing text-sm rules intact. */
+  @media (hover: none) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(40, 30, 15, 0.18);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(40, 30, 15, 0.30);
+    background-clip: padding-box;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(241, 236, 226, 0.18);
+    background-clip: padding-box;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(241, 236, 226, 0.30);
+    background-clip: padding-box;
+  }
+  .dark ::selection {
+    background: rgba(224, 115, 88, 0.30);
+    color: var(--color-ink);
+  }
+  /* Hide scrollbars on touch — they're noise without a hover state */
+  @media (hover: none) {
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+  }
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    /* Interface size factor: each sans option carries an optical multiplier
+       (see fonts.ts) so switching the UI font doesn't change its apparent
+       size. Scaling the root rem rescales everything rem-based; defaults to
+       1, so this is a no-op until a non-baseline interface font is picked.
+       Reading surfaces size in px (see .note-reader below) and are unaffected,
+       so they stay governed by their own --font-reading-scale. */
+    font-size: calc(100% * var(--font-sans-scale, 1));
+  }
+}
+
+/* Tailwind typography emits its rules into the `components` layer (via the
+   plugin's addComponents call). CSS layers cascade by layer priority before
+   specificity — so the plugin's hardcoded light-mode `--tw-prose-*` values
+   beat any `.dark .prose` override placed inside `@layer base`, no matter
+   how specific. Keeping these blocks unlayered puts them above every layered
+   rule, which is what makes the dark-mode markdown actually pick up the
+   token palette below. Same goes for the .prose pre / code workarounds —
+   they have to outweigh the plugin's own pre/code styling. */
+
+/* Markdown code blocks must scroll inside themselves, never trap the page.
+   overflow-y is pinned to hidden so the spec-mandated visible→auto coercion
+   doesn't turn <pre> into a y-axis scroll container too — on iOS that
+   captures vertical pan gestures over the block and freezes page scroll. */
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+}
+.prose code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Markdown tables must scroll inside themselves too. On a narrow phone a wide
+   table (e.g. an assistant's comparison grid) overflows the message bubble and
+   the right-hand columns get clipped with no way to reach them. Making the
+   table a block-level scroll container lets it pan horizontally instead. The
+   plugin-supplied `width: 100%` still fills the bubble for narrow tables, while
+   wider content overflows into the scroll. overflow-y stays hidden and
+   overscroll-x is contained for the same iOS reasons as the <pre> block above:
+   keep the horizontal pan from leaking into a vertical page-scroll trap. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+}
+
+.dark .prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--border);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-kbd: var(--foreground);
+  --tw-prose-kbd-shadows: 17 24 39;
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: #e4ddd0;
+  --tw-prose-pre-bg: #16130f;
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+}
+.dark .prose :where(code):not(:where([class~="not-prose"] *)) {
+  background: var(--muted);
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+}
+.dark .prose :where(code):not(:where([class~="not-prose"] *))::before,
+.dark .prose :where(code):not(:where([class~="not-prose"] *))::after {
+  content: "";
+}
+.dark .prose :where(a):not(:where([class~="not-prose"] *)) {
+  text-decoration-color: color-mix(in oklab, var(--primary) 60%, transparent);
+}
+
+/* E-reader surface — opt-in, Kindle-like typography for /notes long-form view.
+   Sizing/family/width are driven by data-* attributes set by NoteReader. The
+   sepia toggle lives on the overlay root and rebinds --reader-bg/--reader-fg
+   so the surface (and prose) cascade onto a warm palette in both themes. */
+.note-reader {
+  font-family: var(--font-reading);
+  line-height: 1.75;
+  letter-spacing: 0.005em;
+  color: var(--reader-fg, var(--foreground));
+  hyphens: auto;
+  text-wrap: pretty;
+  max-width: 46rem;
+}
+.note-reader[data-family="sans"] {
+  font-family: var(--font-sans);
+}
+/* The reading size factor (--font-reading-scale) rides on the base px size so
+   the whole column - body, em-relative headings, code - scales together when
+   the Reading font changes. This surface is shared by the note reader and the
+   chat message column, so it governs long-form text app-wide. Defaults to 1. */
+.note-reader[data-size="sm"] { font-size: calc(16px * var(--font-reading-scale, 1)); }
+.note-reader[data-size="md"] { font-size: calc(18px * var(--font-reading-scale, 1)); }
+.note-reader[data-size="lg"] { font-size: calc(20px * var(--font-reading-scale, 1)); }
+.note-reader[data-size="xl"] { font-size: calc(22px * var(--font-reading-scale, 1)); }
+.note-reader[data-width="narrow"] { max-width: 38rem; }
+.note-reader[data-width="medium"] { max-width: 46rem; }
+.note-reader[data-width="wide"]   { max-width: 60rem; }
+.note-reader h1,
+.note-reader h2,
+.note-reader h3,
+.note-reader h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+/* Headings use the display font, so they take the headings size factor on top
+   of the inherited reading scale (their em base). */
+.note-reader h1 { font-size: calc(1.6em * var(--font-display-scale, 1)); line-height: 1.2; margin-top: 0; }
+.note-reader h2 { font-size: calc(1.3em * var(--font-display-scale, 1)); line-height: 1.25; }
+.note-reader p,
+.note-reader li {
+  text-wrap: pretty;
+}
+.note-reader p { margin: 0.9em 0 1.05em; }
+.note-reader blockquote {
+  font-style: italic;
+  border-left: 2px solid var(--border);
+  padding-left: 1em;
+  color: var(--muted-foreground);
+}
+.note-reader pre,
+.note-reader code {
+  font-family: var(--font-mono);
+  hyphens: none;
+}
+.note-reader pre { font-size: calc(0.85em * var(--font-mono-scale, 1)); line-height: 1.6; }
+.note-reader .note-reader-byline {
+  margin-top: -0.4em;
+  font-size: 0.85em;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.note-reader .note-reader-role {
+  font-size: 0.7em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* Shared note-body prose. Notes are a "Reading" surface (see the Fonts setting:
+   "messages, notes, and the reader"), but several note views render plain
+   `prose`, which inherits the interface --font-sans. Bind the same font roles
+   the reader uses so every note surface - the expanded viewer, note cards, the
+   export preview, public shares - obeys the user's system Reading/Heading font.
+   Family only: per-surface sizing/measure stay as-is; the full reader treatment
+   (size + column width) lives on .note-reader. */
+.note-prose {
+  font-family: var(--font-reading);
+}
+.note-prose :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-display);
+}
+.note-prose :is(pre, code, kbd, samp) {
+  font-family: var(--font-mono);
+}
+
+[data-sepia="true"] {
+  --reader-bg: #f6ecd6;
+  --reader-fg: #2b2114;
+  --border: #d8c9a8;
+  --muted-foreground: #6f6149;
+}
+.dark [data-sepia="true"],
+.dark[data-sepia="true"] {
+  --reader-bg: #1c1814;
+  --reader-fg: #e8dcc4;
+  --border: #3a342c;
+  --muted-foreground: #a89e89;
+}
+
+/* Reader design system — the therapy-mode vocabulary, generalized so every
+   surface in the app can speak it: one centered serif column, uppercase
+   micro-labels, italic bylines, hairline rules instead of cards/shadows. */
+.reader-col {
+  width: 100%;
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+.reader-serif {
+  font-family: var(--font-reading);
+  line-height: 1.75;
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
+}
+.reader-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.reader-byline {
+  font-size: 0.85em;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+.reader-row {
+  display: block;
+  width: 100%;
+  padding-block: 0.9rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+}
+
+/* Hairline boundary for things that still need an edge (artifact frames,
+   attachment chips) — quiet by construction: no fill, no shadow. */
+@utility hairline {
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+  background: transparent;
+  box-shadow: none;
+}
+
+/* "Paper" surfaces — kept under the legacy glass / glass-strong names so
+   existing call-sites cascade onto the new look without per-file edits.
+   Flattened to hairline boundaries for the reader redesign. */
+@utility glass {
+  background: transparent;
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+@utility glass-strong {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+@utility accent-gradient {
+  background: var(--color-accent);
+}
+
+@utility accent-text {
+  color: var(--color-accent);
+}
+
+/* Mobile UX utilities ----------------------------------------------------- */
+
+/* Press feedback for any tappable surface. Pair with native button/link
+   elements; safe to use alongside shadcn Button which already has its own
+   active styles, but prefer applying .tap to non-shadcn tappable surfaces
+   (Links, custom buttons, sheet handles). */
+@utility tap {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform 80ms ease, opacity 80ms ease;
+}
+
+/* Single, momentum-correct scrolling region. Use on the one element per
+   route that actually scrolls. overflow-x is clipped because setting only
+   overflow-y: auto computes overflow-x to auto per the CSS spec, which makes
+   the region horizontally scrollable as soon as any descendant overflows
+   (long URLs in prose, pre-line model thinking) — that lets a stray swipe
+   shove the chat sideways and clip message bubbles off the left edge. */
+@utility scroll-area {
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe-area helpers — mirror env(safe-area-inset-*) without the verbosity. */
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility safe-x {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.tap:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Indeterminate progress bar that slides a slug across a track. Used by the
+ * chat StreamingBar so users can see the chat is still working even when the
+ * model has gone quiet between thinking deltas. */
+@keyframes streaming-bar {
+  0%   { transform: translateX(-40%); }
+  100% { transform: translateX(240%); }
+}
+
+/* Widgets dashboard grid columns. Mobile: 2 columns; desktop: 4. The widget
+ * tiles span by `cols` (clamped to whatever this var resolves to). */
+:root { --widget-cols-default: 4; }
+@media (max-width: 640px) {
+  :root { --widget-cols-default: 2; }
+}
+
+/* Respect the OS "reduce motion" setting. We keep opacity transitions (which
+ * read as instant cross-fades) but neutralize movement: the slide/zoom on
+ * dialogs and dropdowns, the .tap press-scale, spinners, and the streaming /
+ * fade-in keyframes. Animations are reduced to a near-instant 1ms so logic that
+ * waits on animationend still fires. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tap:active {
+    transform: none !important;
+  }
+}

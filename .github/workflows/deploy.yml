@@ -1,0 +1,17 @@
+# Vercel deployments are handled by Vercel's native Git integration, not by
+# this workflow. This file is intentionally a manual-only no-op: a workflow
+# file with no valid `on:`/`jobs:` (the previous fully-commented state) is
+# reported by GitHub as an "invalid workflow file" and fails on every push.
+# Keeping a valid, manual-only placeholder stops those spurious failed runs
+# while leaving a home for the CLI-based deploy steps if they're ever needed
+# again (see git history for the original `vercel pull/build/deploy` steps).
+name: Deploy to Vercel (disabled)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Vercel deploys run via the native Git integration; nothing to do here."

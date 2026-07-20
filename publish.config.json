@@ -1,0 +1,28 @@
+{
+  "publicRemote": "https://github.com/andrsnn/lasagna.git",
+  "publishBranch": "main",
+  "commitAuthorName": "andrsnn",
+  "commitAuthorEmail": "andrsnn@users.noreply.github.com",
+  "commitMessage": "Publish Lasagna snapshot",
+  "exclude": [
+    ".publish-readiness",
+    "DEMO_SUMMARY.md",
+    "feature-inventory.md",
+    "final-summary.md",
+    "gap-report.md",
+    "principles.md",
+    "showcase-screenshots.md",
+    "spec.md",
+    "take-showcase-screenshots.mjs",
+    ".principles",
+    "scripts/capture-full.mjs",
+    "scripts/capture-tall.mjs",
+    "scripts/clear-account-sync.mjs",
+    "scripts/count-idb.mjs",
+    "scripts/record-walkthrough.mjs",
+    "scripts/seed-data.mjs",
+    "scripts/seed-demo.mjs",
+    "scripts/showcase-capture.mjs",
+    "scripts/verify-demo.mjs"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+  "crons": [
+    { "path": "/api/cron/run-schedules", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/run-schedules", "schedule": "30 12 * * *" }
+  ]
+}

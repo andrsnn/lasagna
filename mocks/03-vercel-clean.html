@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Artifacts — Vercel Clean</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface-2: #161616;
+    --surface-3: #1d1d1d;
+    --line: #232323;
+    --line-2: #2e2e2e;
+    --ink: #ededed;
+    --ink-soft: #a1a1a1;
+    --ink-dim: #707070;
+    --accent: #00d26a;
+    --accent-bg: rgba(0,210,106,0.10);
+    --sans: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    --mono: ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    min-height: 100vh;
+    background: #1a1a1a;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(255,255,255,0.04), transparent 40%),
+      radial-gradient(circle at 80% 100%, rgba(0,210,106,0.04), transparent 50%);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+  .phone-frame {
+    width: 414px;
+    height: 868px;
+    background: #1a1a1f;
+    border-radius: 56px;
+    padding: 12px;
+    box-shadow: 0 60px 120px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
+    position: relative;
+  }
+  .phone-island {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 32px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 10;
+  }
+  .phone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 44px;
+    overflow: hidden;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .status-bar {
+    height: 50px;
+    padding: 18px 28px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    font: 600 13px/1 var(--sans);
+    color: var(--ink);
+  }
+  .status-bar .right { display: flex; align-items: center; gap: 6px; }
+  .battery {
+    font-size: 11px; font-weight: 700;
+    border: 1px solid currentColor; border-radius: 3px;
+    padding: 0 4px; line-height: 13px;
+    opacity: 0.85;
+  }
+
+  .scroll {
+    height: calc(100% - 50px - 56px);
+    padding: 0 0 12px;
+    overflow: hidden;
+  }
+
+  .top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .wordmark {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+  }
+  .wordmark .dotmark {
+    width: 18px; height: 18px;
+    background: var(--ink);
+    transform: rotate(45deg);
+    border-radius: 3px;
+  }
+  .top-actions { display: flex; gap: 8px; align-items: center; }
+  .top-actions .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid rgba(0,210,106,0.25);
+    border-radius: 999px;
+    padding: 3px 8px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .top-actions .badge .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 6px var(--accent);
+  }
+  .icon-btn {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .icon-btn svg { width: 14px; height: 14px; }
+
+  .heading {
+    padding: 18px 18px 6px;
+  }
+  .heading .crumb {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+  }
+  .heading h1 {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.015em;
+    margin: 0;
+  }
+
+  .filter-row {
+    padding: 12px 18px 6px;
+    display: flex; gap: 8px;
+  }
+  .search-input {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .search-input svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .search-input .kbd {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-dim);
+    background: var(--surface-3);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .filter-chip {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .list {
+    margin: 8px 18px 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .row:last-child { border-bottom: none; }
+  .row-thumb {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+    position: relative;
+  }
+  .row-thumb::after {
+    content: '';
+    position: absolute; top:0; left:0; right:0; height: 1px;
+    background: rgba(255,255,255,0.18);
+  }
+  .thumb-1 { background: linear-gradient(135deg, #ff8c4d, #f5577a); }
+  .thumb-2 { background: linear-gradient(135deg, #00d26a, #00a8d2); }
+  .thumb-3 { background: linear-gradient(135deg, #f5ce4d, #f5777a); }
+  .thumb-4 { background: linear-gradient(135deg, #6b5b95, #4a7ba6); }
+  .thumb-5 { background: linear-gradient(135deg, #d65a31, #f3a26b); }
+  .thumb-6 { background: linear-gradient(135deg, #00d26a, #4a7ba6); }
+  .row-body { flex: 1; min-width: 0; }
+  .row-title {
+    font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--ink);
+  }
+  .row-meta {
+    font-family: var(--mono);
+    font-size: 11px; color: var(--ink-dim);
+    margin-top: 2px;
+    display: flex; align-items: center; gap: 6px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .row-meta .sep { color: var(--line-2); }
+  .row-pill {
+    font-family: var(--mono);
+    font-size: 9.5px; font-weight: 500;
+    padding: 2px 6px; border-radius: 4px;
+    background: var(--surface-3);
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .row-pill.live {
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-color: rgba(0,210,106,0.25);
+  }
+  .row-pill.live .live-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 4px var(--accent);
+  }
+  .row-pill.warn {
+    background: rgba(244,180,84,0.10);
+    color: #f4b454;
+    border-color: rgba(244,180,84,0.25);
+  }
+  .row-chev {
+    color: var(--ink-dim);
+    flex-shrink: 0;
+  }
+  .row-chev svg { width: 14px; height: 14px; }
+
+  .subhead {
+    padding: 16px 18px 4px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .subhead h2 {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
+  }
+  .subhead .count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  .fab {
+    position: absolute;
+    right: 22px;
+    bottom: 76px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #002b15;
+    border: none;
+    cursor: pointer;
+    display: grid; place-items: center;
+    box-shadow: 0 12px 32px -6px rgba(0,210,106,0.5), 0 0 0 1px rgba(0,210,106,0.4), 0 0 24px rgba(0,210,106,0.25);
+  }
+  .fab svg { width: 22px; height: 22px; }
+
+  .bottom-nav {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 56px;
+    display: flex; align-items: stretch;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+  .nav-item {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px;
+    color: var(--ink-dim);
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    font-size: 10px;
+    font-weight: 500;
+    font-family: inherit;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 30%; right: 30%;
+    height: 2px;
+    background: var(--accent);
+  }
+</style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-island"></div>
+    <div class="phone-screen">
+      <div class="status-bar">
+        <span>9:41</span>
+        <span class="right">
+          <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M1 4.5h14M1 7.5h11M1 10.5h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M1 5.5L7 1.5L13 5.5M3 7.5L7 4.5L11 7.5M5 9.5L7 8L9 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span class="battery">87</span>
+        </span>
+      </div>
+
+      <div class="top">
+        <div class="wordmark">
+          <span class="dotmark"></span>
+          <span>artifacts</span>
+        </div>
+        <div class="top-actions">
+          <span class="badge"><span class="live-dot"></span>2 streaming</span>
+          <button class="icon-btn" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="scroll">
+        <div class="heading">
+          <div class="crumb">/ desktop</div>
+          <h1>5 live artifacts</h1>
+        </div>
+
+        <div class="filter-row">
+          <div class="search-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            Search artifacts…
+            <span class="kbd">⌘K</span>
+          </div>
+          <button class="filter-chip">
+            All
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+
+        <div class="subhead">
+          <h2>Recent</h2>
+          <span class="count">5 of 12</span>
+        </div>
+
+        <div class="list">
+          <div class="row">
+            <div class="row-thumb thumb-1"></div>
+            <div class="row-body">
+              <div class="row-title">Daily AI Brief <span class="row-pill live"><span class="live-dot"></span>live</span></div>
+              <div class="row-meta">news-digest <span class="sep">/</span> 142 stories <span class="sep">/</span> 2m ago</div>
+            </div>
+            <div class="row-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></div>
+          </div>
+          <div class="row">
+            <div class="row-thumb thumb-2"></div>
+            <div class="row-body">
+              <div class="row-title">Habit tracker</div>
+              <div class="row-meta">personal <span class="sep">/</span> 14/21 done <span class="sep">/</span> 1h ago</div>
+            </div>
+            <div class="row-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></div>
+          </div>
+          <div class="row">
+            <div class="row-thumb thumb-3"></div>
+            <div class="row-body">
+              <div class="row-title">Tokyo trip board</div>
+              <div class="row-meta">itinerary <span class="sep">/</span> 6 stops <span class="sep">/</span> yesterday</div>
+            </div>
+            <div class="row-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></div>
+          </div>
+          <div class="row">
+            <div class="row-thumb thumb-4"></div>
+            <div class="row-body">
+              <div class="row-title">JIRA → Standup <span class="row-pill warn">needs config</span></div>
+              <div class="row-meta">work-helper <span class="sep">/</span> last run 2d ago</div>
+            </div>
+            <div class="row-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></div>
+          </div>
+          <div class="row">
+            <div class="row-thumb thumb-5"></div>
+            <div class="row-body">
+              <div class="row-title">Recipe sketchpad</div>
+              <div class="row-meta">cooking <span class="sep">/</span> 12 dishes <span class="sep">/</span> last week</div>
+            </div>
+            <div class="row-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></div>
+          </div>
+          <div class="row">
+            <div class="row-thumb thumb-6"></div>
+            <div class="row-body">
+              <div class="row-title">Crypto pulse <span class="row-pill live"><span class="live-dot"></span>live</span></div>
+              <div class="row-meta">dashboard <span class="sep">/</span> +4.2% 24h <span class="sep">/</span> just now</div>
+            </div>
+            <div class="row-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></div>
+          </div>
+        </div>
+
+        <div class="subhead">
+          <h2>Pinned templates</h2>
+          <span class="count">3</span>
+        </div>
+
+        <div class="filter-row" style="padding-bottom:0; flex-wrap: wrap;">
+          <div class="filter-chip" style="font-family:var(--mono);"><span style="color:var(--accent)">+</span>&nbsp;news-digest</div>
+          <div class="filter-chip" style="font-family:var(--mono);"><span style="color:var(--accent)">+</span>&nbsp;dashboard</div>
+          <div class="filter-chip" style="font-family:var(--mono);"><span style="color:var(--accent)">+</span>&nbsp;tracker</div>
+        </div>
+      </div>
+
+      <button class="fab" aria-label="New artifact">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+
+      <div class="bottom-nav">
+        <button class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Desktop
+        </button>
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7l9 5 9-5-9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
+          Templates
+        </button>
+        <button class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg>
+          Chats
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
